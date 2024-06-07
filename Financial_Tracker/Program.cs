@@ -13,7 +13,14 @@ builder.Services.AddDbContext<DbContextClass>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
 builder.Services.AddControllers();
+
+
 
 builder.Services.AddSwaggerGen(options =>
 {

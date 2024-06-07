@@ -21,40 +21,7 @@ namespace Financial_Tracker.Controllers
             _context = context;
         }
 
-        [HttpGet("user-account")]
-        public async Task<ActionResult<Account>> GetUserAccount()
-        {
-            // Get the username from the JWT claims
-            var username = User.FindFirst(ClaimTypes.Name)?.Value;
-
-            if (string.IsNullOrEmpty(username))
-            {
-                return BadRequest("Username not found in JWT token.");
-            }
-
-            // Find the user by username
-            var user = await _context.Users
-                .SingleOrDefaultAsync(u => u.Username == username);
-
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-
-            // Find the account associated with the user
-            var account = await _context.Account
-                .FirstOrDefaultAsync(a => a.userId == user.Id);
-
-            if (account == null)
-            {
-                return NotFound("User does not have an account.");
-            }
-
-            return Ok(account);
-        }
-
         
-
 
     }
 }
