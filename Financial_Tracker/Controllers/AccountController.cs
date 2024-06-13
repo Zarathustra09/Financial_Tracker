@@ -55,7 +55,7 @@ namespace Financial_Tracker.Controllers
         }
 
         [HttpPost("create-account")]
-        [Authorize]
+      
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto createAccountDto)
         {
             if (!ModelState.IsValid)
@@ -89,6 +89,49 @@ namespace Financial_Tracker.Controllers
 
             // Add the new account to the database
             _context.Account.Add(account);
+            await _context.SaveChangesAsync();
+
+            return Ok(account);
+        }
+
+        [HttpPost("add-income")]
+        [Authorize]
+        public async Task<IActionResult> AddIncome([FromBody] CreateIncomeDto createIncomeDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Get the username from the JWT claims
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return Unauthorized("Username not found in JWT token.");
+            }
+
+            // Find the user by username
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Find the account associated with the income
+            var account = await _context.Account
+                .SingleOrDefaultAsync(a => a.Id == createIncomeDto.AccountId && a.userId == user.Id);
+
+            if (account == null)
+            {
+                return NotFound("Account not found or does not belong to the user.");
+            }
+
+            // Add the income amount to the account balance
+            account.Balance += createIncomeDto.Amount;
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
 
             return Ok(account);
