@@ -55,7 +55,7 @@ namespace Financial_Tracker.Controllers
         }
 
         [HttpPost("create-account")]
-      
+        [Authorize]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto createAccountDto)
         {
             if (!ModelState.IsValid)
